@@ -28,6 +28,16 @@ final class Annotation
     {
         $parser = new AnnotationParser();
 
+        $this->collectPropertyAnnotations($parser, $class);
+        $this->collectMethodParameterAnnotations($parser, $class);
+    }
+
+    /**
+     * @param AnnotationParser $parser
+     * @param ReflectionClass  $class
+     */
+    private function collectPropertyAnnotations(AnnotationParser $parser, ReflectionClass $class): void
+    {
         foreach ($parser->parsePropertyAnnotations($class->getDocComment()) as $annotation) {
             $this->properties[$annotation->getName()] = $annotation;
         }
@@ -36,7 +46,14 @@ final class Annotation
             $annotations                       = $parser->parseVariableAnnotations($property->getDocComment());
             $this->properties[$property->name] = array_pop($annotations);
         }
+    }
 
+    /**
+     * @param AnnotationParser $parser
+     * @param ReflectionClass  $class
+     */
+    private function collectMethodParameterAnnotations(AnnotationParser $parser, ReflectionClass $class): void
+    {
         foreach ($class->getMethods() as $method) {
             $name = $method->getName();
 

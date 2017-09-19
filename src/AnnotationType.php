@@ -85,13 +85,9 @@ final class AnnotationType
     {
         $type = TypeFactory::expression($expression);
         if ($type->isArray() && $this->hasNext()) {
-            foreach ($expression as $expr) {
-                if (!$this->next()->isImplicit($expr)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return $this->compare($expression, function (self $type, $expr): bool {
+                return $type->isImplicit($expr);
+            });
         }
 
         return $type->isImplicitSame($this->type);
@@ -106,16 +102,29 @@ final class AnnotationType
     {
         $type = TypeFactory::expression($expression);
         if ($type->isArray() && $this->hasNext()) {
-            foreach ($expression as $expr) {
-                if (!$this->next()->isSame($expr)) {
-                    return false;
-                }
-            }
-
-            return true;
+            return $this->compare($expression, function (self $type, $expr): bool {
+                return $type->isSame($expr);
+            });
         }
 
         return $type->isSame($this->type);
+    }
+
+    /**
+     * @param array    $expression
+     * @param callable $callback
+     *
+     * @return bool
+     */
+    private function compare(array $expression, callable $callback): bool
+    {
+        foreach ($expression as $expr) {
+            if (!$callback($this->next(), $expr)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -123,14 +132,9 @@ final class AnnotationType
      */
     public function getDimension(): int
     {
-        $brackets = 0;
-        $type     = $this;
-        while ($type->hasNext()) {
-            $type = $type->next();
-            $brackets++;
-        }
+        $this->iterate($dimension);
 
-        return $brackets;
+        return $dimension;
     }
 
     /**
@@ -138,12 +142,24 @@ final class AnnotationType
      */
     public function getBaseType(): Type
     {
-        $type = $this;
+        return $this->iterate()->getType();
+    }
+
+    /**
+     * @param int|null $dimension
+     *
+     * @return AnnotationType
+     */
+    private function iterate(int &$dimension = null): AnnotationType
+    {
+        $dimension = 0;
+        $type      = $this;
         while ($type->hasNext()) {
             $type = $type->next();
+            $dimension++;
         }
 
-        return $type->getType();
+        return $type;
     }
 
     /**
