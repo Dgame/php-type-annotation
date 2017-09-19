@@ -21,7 +21,6 @@ final class Test
      */
     public function setStreets(array $streets)
     {
-
     }
 
     /**
@@ -29,7 +28,6 @@ final class Test
      */
     public function setNummer(float $nr)
     {
-
     }
 
     /**
@@ -37,6 +35,5 @@ final class Test
      */
     public function setEinwohner(int $einwohner)
     {
-
     }
 }
