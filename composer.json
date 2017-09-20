@@ -1,14 +1,14 @@
 {
-    "name": "dgame/php-annotation",
-    "description": "php annotation",
+    "name": "dgame/php-type-annotation",
+    "description": "php type annotation",
     "license": "MIT",
     "type": "library",
-    "homepage": "https://github.com/php-annotation",
+    "homepage": "https://github.com/php-type-annotation",
     "authors": [
         {
             "name": "Randy Schuett ",
             "email": "rswhite4@gmail.com",
-            "homepage": "https://github.com/php-annotation"
+            "homepage": "https://github.com/php-type-annotation"
         }
     ],
     "require": {
