@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class AnnotationParserTest extends TestCase
 {
-    public function testParseProperty()
+    public function testParseProperty(): void
     {
         $parser     = new AnnotationParser();
         $annotation = $parser->parsePropertyAnnotations('@property string[] $ids');

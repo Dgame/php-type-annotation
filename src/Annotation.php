@@ -2,6 +2,7 @@
 
 namespace Dgame\Annotation;
 
+use Exception;
 use ReflectionClass;
 
 /**
@@ -23,6 +24,8 @@ final class Annotation
      * Annotation constructor.
      *
      * @param ReflectionClass $class
+     *
+     * @throws Exception
      */
     public function __construct(ReflectionClass $class)
     {
@@ -35,30 +38,43 @@ final class Annotation
     /**
      * @param AnnotationParser $parser
      * @param ReflectionClass  $class
+     *
+     * @throws Exception
      */
     private function collectPropertyAnnotations(AnnotationParser $parser, ReflectionClass $class): void
     {
-        foreach ($parser->parsePropertyAnnotations($class->getDocComment()) as $annotation) {
+        $comment = $class->getDocComment();
+        $comment = $comment === false ? '' : $comment;
+        foreach ($parser->parsePropertyAnnotations($comment) as $annotation) {
             $this->properties[$annotation->getName()] = $annotation;
         }
 
         foreach ($class->getProperties() as $property) {
-            $annotations                       = $parser->parseVariableAnnotations($property->getDocComment());
-            $this->properties[$property->name] = array_pop($annotations);
+            $comment     = $property->getDocComment();
+            $comment     = $comment === false ? '' : $comment;
+            $annotations = $parser->parseVariableAnnotations($comment);
+            $annotation  = array_pop($annotations);
+            if ($annotation !== null) {
+                $this->properties[$property->name] = $annotation;
+            }
         }
     }
 
     /**
      * @param AnnotationParser $parser
      * @param ReflectionClass  $class
+     *
+     * @throws Exception
      */
     private function collectMethodParameterAnnotations(AnnotationParser $parser, ReflectionClass $class): void
     {
         foreach ($class->getMethods() as $method) {
-            $name = $method->getName();
+            $name    = $method->getName();
+            $comment = $method->getDocComment();
+            $comment = $comment === false ? '' : $comment;
 
             $this->parameters[$name] = [];
-            foreach ($parser->parseParameterAnnotations($method->getDocComment()) as $annotation) {
+            foreach ($parser->parseParameterAnnotations($comment) as $annotation) {
                 $this->parameters[$name][$annotation->getName()] = $annotation;
             }
         }
@@ -93,7 +109,7 @@ final class Annotation
     }
 
     /**
-     * @return VariableAnnotation[]
+     * @return VariableAnnotation[][]
      */
     public function getAllMethodsParameters(): array
     {

@@ -4,6 +4,7 @@ namespace Dgame\Annotation;
 
 use Dgame\Type\Type;
 use Dgame\Type\TypeFactory;
+use Exception;
 
 /**
  * Class AnnotationType
@@ -16,7 +17,7 @@ final class AnnotationType
      */
     private $type;
     /**
-     * @var AnnotationType
+     * @var AnnotationType|null
      */
     private $next;
 
@@ -25,6 +26,8 @@ final class AnnotationType
      *
      * @param string              $type
      * @param AnnotationType|null $next
+     *
+     * @throws Exception
      */
     private function __construct(string $type, self $next = null)
     {
@@ -36,10 +39,11 @@ final class AnnotationType
      * @param string $type
      *
      * @return AnnotationType
+     * @throws Exception
      */
     public static function parse(string $type): self
     {
-        if (preg_match_all('/(\[\s*\])/i', $type, $brackets)) {
+        if (preg_match_all('/(\[\s*\])/S', $type, $brackets)) {
             $base = str_replace(['[', ']'], '', $type);
             $type = new self('array', new self($base));
             for ($i = 1, $c = count($brackets[1]); $i < $c; $i++) {
@@ -69,17 +73,18 @@ final class AnnotationType
     }
 
     /**
-     * @return AnnotationType
+     * @return AnnotationType|null
      */
-    public function next(): self
+    public function next(): ?self
     {
         return $this->next;
     }
 
     /**
-     * @param $expression
+     * @param mixed $expression
      *
      * @return bool
+     * @throws Exception
      */
     public function isImplicit($expression): bool
     {
@@ -94,9 +99,10 @@ final class AnnotationType
     }
 
     /**
-     * @param $expression
+     * @param mixed $expression
      *
      * @return bool
+     * @throws Exception
      */
     public function isSame($expression): bool
     {
@@ -138,23 +144,25 @@ final class AnnotationType
     }
 
     /**
-     * @return Type
+     * @return Type|null
      */
-    public function getBaseType(): Type
+    public function getBaseType(): ?Type
     {
-        return $this->iterate()->getType();
+        $type = $this->iterate();
+
+        return $type === null ? null : $type->getType();
     }
 
     /**
      * @param int|null $dimension
      *
-     * @return AnnotationType
+     * @return AnnotationType|null
      */
-    private function iterate(int &$dimension = null): AnnotationType
+    private function iterate(int &$dimension = null): ?AnnotationType
     {
         $dimension = 0;
-        $type      = $this;
-        while ($type->hasNext()) {
+        $type = $this;
+        while ($type !== null && $type->hasNext()) {
             $type = $type->next();
             $dimension++;
         }
@@ -163,10 +171,12 @@ final class AnnotationType
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function export(): string
+    public function export(): ?string
     {
-        return $this->getBaseType()->export() . str_repeat('[]', $this->getDimension());
+        $type = $this->getBaseType();
+
+        return $type === null ? null : $type->export() . str_repeat('[]', $this->getDimension());
     }
 }

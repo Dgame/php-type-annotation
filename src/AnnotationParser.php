@@ -2,18 +2,21 @@
 
 namespace Dgame\Annotation;
 
+use Exception;
+
 /**
  * Class AnnotationParser
  * @package Dgame\Annotation
  */
 final class AnnotationParser
 {
-    const REGEX = '\s+(.*?)\s*(\$.+?)?\s*\z';
+    private const REGEX = '\s+(.*?)\s*(\$.+?)?\s*\z';
 
     /**
      * @param string $comment
      *
      * @return VariableAnnotation[]
+     * @throws Exception
      */
     public function parseParameterAnnotations(string $comment): array
     {
@@ -24,6 +27,7 @@ final class AnnotationParser
      * @param string $comment
      *
      * @return VariableAnnotation[]
+     * @throws Exception
      */
     public function parseVariableAnnotations(string $comment): array
     {
@@ -34,6 +38,7 @@ final class AnnotationParser
      * @param string $comment
      *
      * @return VariableAnnotation[]
+     * @throws Exception
      */
     public function parsePropertyAnnotations(string $comment): array
     {
@@ -45,11 +50,14 @@ final class AnnotationParser
      * @param string $comment
      *
      * @return VariableAnnotation[]
+     * @throws Exception
      */
     private function parseAnnotations(string $annotation, string $comment): array
     {
         $output = [];
-        foreach (preg_split('/\R/m', $comment) as $line) {
+        $lines  = preg_split('/\R/m', $comment);
+        $lines  = $lines === false ? [] : $lines;
+        foreach ($lines as $line) {
             $result = $this->parseAnnotation($annotation, $line);
             if ($result !== null) {
                 $output[] = $result;
@@ -64,6 +72,7 @@ final class AnnotationParser
      * @param string $line
      *
      * @return VariableAnnotation|null
+     * @throws Exception
      */
     private function parseAnnotation(string $annotation, string $line): ?VariableAnnotation
     {

@@ -12,7 +12,7 @@ use ReflectionClass;
  */
 final class AnnotationTest extends TestCase
 {
-    public function testAnnoation()
+    public function testAnnoation(): void
     {
         $annotation = new Annotation(new ReflectionClass(Test::class));
         $this->assertCount(3, $annotation->getAllProperties());

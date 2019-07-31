@@ -2,6 +2,8 @@
 
 namespace Dgame\Annotation;
 
+use Exception;
+
 /**
  * Class VariableAnnotation
  * @package Dgame\Annotation
@@ -22,6 +24,8 @@ final class VariableAnnotation
      *
      * @param string $type
      * @param string $id
+     *
+     * @throws Exception
      */
     public function __construct(string $type, string $id)
     {
