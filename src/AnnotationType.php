@@ -158,10 +158,10 @@ final class AnnotationType
      *
      * @return AnnotationType|null
      */
-    private function iterate(int &$dimension = null): ?AnnotationType
+    private function iterate(int &$dimension = null): ?self
     {
         $dimension = 0;
-        $type = $this;
+        $type      = $this;
         while ($type !== null && $type->hasNext()) {
             $type = $type->next();
             $dimension++;

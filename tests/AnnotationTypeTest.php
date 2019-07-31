@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  */
 final class AnnotationTypeTest extends TestCase
 {
-    public function testImplicit()
+    public function testImplicit(): void
     {
         $this->assertTrue(AnnotationType::parse('string[]')->isImplicit(['a', 'b']));
         $this->assertTrue(AnnotationType::parse('string[]')->isImplicit([]));
@@ -29,7 +29,7 @@ final class AnnotationTypeTest extends TestCase
         $this->assertTrue(AnnotationType::parse('int[][]')->isImplicit([[4, 2]]));
     }
 
-    public function testSame()
+    public function testSame(): void
     {
         $this->assertTrue(AnnotationType::parse('string[]')->isSame(['a', 'b']));
         $this->assertTrue(AnnotationType::parse('string[]')->isSame([]));
